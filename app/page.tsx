@@ -1,65 +1,143 @@
-import Image from "next/image";
+"use client";
+import { useEffect, useState } from "react";
+import ReactConfetti from "react-confetti";
 
 export default function Home() {
+
+  const [showVideo, setShowVideo] = useState(false);
+  const [noPos, setNoPos] = useState({top:"50%",left:"60%"});
+  const [size, setSize] = useState({width: 0, height:0});
+  const [answer, setAnswer] = useState<string | null>(null);
+
+
+  useEffect(() => {
+    setSize({
+      width:window.innerWidth,
+      height:window.innerHeight
+    });
+
+    const saved = localStorage.getItem("answer");
+    if (saved === "YES") {
+      setAnswer("YES");
+      setShowVideo(true);
+    }
+  }, []);
+
+  const moveNoButton = () => {
+    const top = Math.random() * 80 + "%";
+    const left = Math.random() * 80 + "%";
+    setNoPos({top, left});
+  };
+
+  const handleYes = () => {
+    setAnswer("YES");
+    setShowVideo(true);
+    localStorage.setItem("answer", "YES");
+  };
+
+  const restart = () => {
+    setShowVideo(false);
+    setNoPos({ top: "50%", left: "60%" });
+  };
+
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+      <main style={styles.container}>
+        {showVideo && <ReactConfetti width={size.width} height={size.height} />}
+
+        <h1 style={styles.title}>Will You Marry Me? 💍❤️</h1>
+
+        {!showVideo && (
+          <>
+          <div style={styles.buttonWrap}>
+            <button style={styles.yesBtn} onClick={handleYes}>
+              YES 😍
+            </button>
+            <button
+              style={{...styles.noBtn, ...noPos}}
+              onMouseEnter={moveNoButton}
+              onClick={moveNoButton}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+              NO 😅
+            </button>
+          </div>
+          </>
+        )}
+
+        {showVideo && (
+        <div style={styles.popup}>
+          <p style={{ fontSize: "22px" }}>
+            Your answer: <strong>{answer}</strong>
           </p>
+
+          <h2>Good decision 😘 You’ll always be mine ❤️</h2>
+          <video width="420" autoPlay controls>
+            <source src="/love.mp4" type="video/mp4" />
+          </video>
+
+          <button style={styles.restartBtn} onClick={restart}>
+            Restart 🔁
+          </button>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+      )}
       </main>
-    </div>
   );
 }
+
+const styles: any = {
+  container: {
+    height: "100vh",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    background: "linear-gradient(#ff9a9e, #fad0c4)",
+  },
+
+  title: {
+    fontSize: "50px",
+    marginBottom: "50px",
+  },
+
+  buttonWrap: {
+    position: "relative",
+    width: "400px",
+    height: "200px",
+  },
+
+  yesBtn: {
+    padding: "15px 30px",
+    fontSize: "20px",
+    borderRadius: "10px",
+    background: "#ff4d6d",
+    color: "white",
+    border: "none",
+    cursor: "pointer",
+  },
+
+  noBtn: {
+    position: "absolute",
+    padding: "15px 30px",
+    fontSize: "20px",
+    borderRadius: "10px",
+    background: "#555",
+    color: "white",
+    border: "none",
+    cursor: "pointer",
+  },
+
+  popup: {
+    textAlign: "center",
+  },
+
+  restartBtn: {
+    marginTop: "20px",
+    padding: "10px 25px",
+    fontSize: "18px",
+    borderRadius: "10px",
+    background: "#222",
+    color: "white",
+    border: "none",
+    cursor: "pointer",
+  },
+};
